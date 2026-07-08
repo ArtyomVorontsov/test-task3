@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ThreeCanvas from "./components/ThreeCanvas";
+import { GameScreen } from "./components/GameScreen";
 
 export default function App() {
   const [size, setSize] = useState<number | null>(null);
@@ -8,7 +8,7 @@ export default function App() {
     return <Menu onStart={(value) => setSize(value)} />;
   }
 
-  return <ThreeCanvas radius={size} />;
+  return <GameScreen size={size} />;
 }
 
 export function Menu({ onStart }: { onStart: (size: number) => void }) {

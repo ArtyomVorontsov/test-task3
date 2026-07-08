@@ -31,6 +31,13 @@ const DIRECTION_VECTOR: Record<DIRECTION, Position> = {
 export class Game {
   private tiles = new Map<string, Tile>();
 
+  private stats = {
+    score: 0,
+    moves: 0,
+    highestTile: 0,
+    startedAt: Date.now(),
+  };
+
   constructor(private radius: number) {
     this.createBoard();
 
@@ -95,6 +102,8 @@ export class Game {
   }
 
   private move(direction: DIRECTION) {
+    this.stats.moves++;
+
     const lines = this.getLines(direction);
 
     let moved = false;
@@ -131,9 +140,15 @@ export class Game {
       const current = tiles[i];
 
       if (i + 1 < tiles.length && current.value === tiles[i + 1].value) {
+        const newValue = current.value * 2;
+
+        this.stats.score += newValue;
+
+        this.stats.highestTile = Math.max(this.stats.highestTile, newValue);
+
         result.push({
           ...current,
-          value: current.value * 2,
+          value: newValue,
         });
 
         i++;
@@ -195,5 +210,11 @@ export class Game {
     }
 
     return lines;
+  }
+
+  public getStats() {
+    return {
+      ...this.stats,
+    };
   }
 }

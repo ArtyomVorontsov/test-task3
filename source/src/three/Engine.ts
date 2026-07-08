@@ -75,6 +75,10 @@ export class Engine {
     this.scene.add(new THREE.AxesHelper(10));
   }
 
+  public getGame() {
+    return this.game;
+  }
+
   private createBoard() {
     const geometry = new THREE.CylinderGeometry(
       this.hexSize,
