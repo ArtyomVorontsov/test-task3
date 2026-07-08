@@ -15,13 +15,14 @@ export class Engine {
   private controls: OrbitControls;
 
   private animationId?: number;
+  private textTextures = new Map();
 
   private game: Game;
   private hexagons: HexMesh[] = [];
 
   private readonly hexSize = 1;
 
-  constructor(private container: HTMLDivElement) {
+  constructor(private container: HTMLDivElement, private radius: number) {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x202020);
 
@@ -51,7 +52,7 @@ export class Engine {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
 
-    this.game = new Game(1);
+    this.game = new Game(radius);
 
     this.init();
 
@@ -61,11 +62,13 @@ export class Engine {
   private init() {
     this.createBoard();
 
-    const light = new THREE.PointLight(0xffffff, 10);
+    const light = new THREE.PointLight(0xffffff, 15);
 
-    light.position.set(5, 5, 5);
+    light.position.set(3, 3, 0);
 
     this.scene.add(light);
+
+    this.addBackground();
 
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
@@ -83,11 +86,32 @@ export class Engine {
     const tiles = this.game.getMap();
 
     tiles.forEach((tile) => {
-      const material = new THREE.MeshStandardMaterial({
+      const sideMaterial = new THREE.MeshStandardMaterial({
         color: this.getTileColor(tile.value),
       });
 
-      const mesh = new THREE.Mesh(geometry, material);
+      const topMaterial = new THREE.MeshPhysicalMaterial({
+        color: this.getTileColor(tile.value),
+
+        transparent: true,
+        opacity: 0.85,
+
+        transmission: 0.2,
+        roughness: 0.15,
+
+        clearcoat: 1,
+        clearcoatRoughness: 0.1,
+      });
+
+      const materials = [
+        sideMaterial, // side
+        topMaterial, // top
+        topMaterial, // bottom
+      ];
+
+      const mesh = new THREE.Mesh(geometry, materials);
+
+      // const mesh = new THREE.Mesh(geometry, material);
 
       const position = this.hexToWorld(tile.q, tile.r);
 
@@ -113,52 +137,61 @@ export class Engine {
         return;
       }
 
-      const material = hex.mesh.material as THREE.MeshStandardMaterial;
+      const materials = hex.mesh.material as THREE.MeshStandardMaterial[];
 
-      material.color.set(this.getTileColor(tile.value));
+      const sideMaterial = materials[0];
+      const topMaterial = materials[1];
+
+      // update color
+      sideMaterial.color.set(this.getTileColor(tile.value));
+
+      topMaterial.map =
+        tile.value === 0 ? null : this.getTextTexture(tile.value);
+
+      topMaterial.needsUpdate = true;
     });
   }
 
   private getTileColor(value: number): number {
     switch (value) {
       case 0:
-        return 0xcccccc;
+        return 0xd4d0c8; // XP window gray
 
       case 2:
-        return 0xeee4da;
+        return 0x00a651; // XP green
 
       case 4:
-        return 0xede0c8;
+        return 0x0078d7; // XP blue
 
       case 8:
-        return 0xf2b179;
+        return 0xfdb813; // XP yellow
 
       case 16:
-        return 0xf59563;
+        return 0xed1c24; // XP red
 
       case 32:
-        return 0xf67c5f;
+        return 0x33cc66; // bright green
 
       case 64:
-        return 0xf65e3b;
+        return 0x3399ff; // sky blue
 
       case 128:
-        return 0xedcf72;
+        return 0xffcc33; // golden yellow
 
       case 256:
-        return 0xedcc61;
+        return 0xff6666; // soft red
 
       case 512:
-        return 0xedc850;
+        return 0x66ccff; // light blue
 
       case 1024:
-        return 0xedc53f;
+        return 0x99cc33; // lime green
 
       case 2048:
-        return 0xedc22e;
+        return 0xff9933; // orange XP sunset
 
       default:
-        return 0x3c3a32;
+        return 0x666666;
     }
   }
 
@@ -191,6 +224,91 @@ export class Engine {
 
     this.renderer.setSize(width, height);
   };
+
+  private createTextTexture(value: number): THREE.CanvasTexture {
+    const size = 256;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext("2d")!;
+
+    // background
+    ctx.fillStyle = `#${this.getTileColor(value)
+      .toString(16)
+      .padStart(6, "0")}`;
+    ctx.fillRect(0, 0, size, size);
+
+    // move origin to center
+    ctx.translate(size / 2, size / 2);
+
+    // 🔁 rotate 45 degrees
+    ctx.rotate(-(Math.PI / 3));
+
+    // text
+    ctx.fillStyle = value <= 4 ? "#000000" : "#ffffff";
+    // ctx.font = "bold 100px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    // ctx.fillStyle = "#000000";
+    // ctx.font = "bold 90px Tahoma, Arial";
+    const fontSize = value >= 1000 ? 60 : value >= 100 ? 75 : 90;
+    ctx.font = `bold ${fontSize}px Tahoma, Arial`;
+
+    const gradient = ctx.createLinearGradient(0, 0, size, size);
+
+    const base = this.getTileColor(value);
+    const hex = `#${base.toString(16).padStart(6, "0")}`;
+
+    gradient.addColorStop(0, "#ffffff");
+    gradient.addColorStop(0.3, hex);
+    gradient.addColorStop(1, "#7aa7d9");
+
+    // ctx.fillStyle = gradient;
+    // ctx.fillRect(0, 0, size, size);
+
+    // ctx.fillStyle = "rgba(255,255,255,0.4)";
+    // ctx.fillRect(0, 0, size, size * 0.3);
+
+    // ctx.strokeStyle = "#808080";
+    // ctx.lineWidth = 4;
+    // ctx.strokeRect(0, 0, size, size);
+
+    if (value > 0) {
+      ctx.fillText(value.toString(), 0, 0);
+    }
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+
+    return texture;
+  }
+
+  private getTextTexture(value: number) {
+    if (!this.textTextures.has(value)) {
+      this.textTextures.set(value, this.createTextTexture(value));
+    }
+    return this.textTextures.get(value)!;
+  }
+
+  private addBackground() {
+    const textureLoader = new THREE.TextureLoader();
+
+    const texture = textureLoader.load("background.jpg");
+
+    const geometry = new THREE.SphereGeometry(100, 32, 32);
+
+    geometry.scale(-1, 1, 1);
+
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+    });
+
+    const sky = new THREE.Mesh(geometry, material);
+
+    this.scene.add(sky);
+  }
 
   public dispose() {
     if (this.animationId) {
