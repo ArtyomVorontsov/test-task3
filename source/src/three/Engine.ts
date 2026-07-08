@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Game } from "./Game";
+import backgroundImage from "../../assets/background-compressed.jpg";
 
 type HexMesh = {
   q: number;
@@ -299,7 +300,7 @@ export class Engine {
   private addBackground() {
     const textureLoader = new THREE.TextureLoader();
 
-    const texture = textureLoader.load("background.jpg");
+    const texture = textureLoader.load(backgroundImage);
 
     const geometry = new THREE.SphereGeometry(100, 32, 32);
 
