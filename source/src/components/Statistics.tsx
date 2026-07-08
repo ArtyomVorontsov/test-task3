@@ -154,6 +154,8 @@ export function GameStats({ game }: { game: Game | null }) {
           Time:
           <b> {Math.floor((Date.now() - stats.startedAt) / 1000)}s</b>
         </div>
+
+        {stats.gameOver && <div>Game Over!</div>}
       </div>
 
       {/* XP status bar */}

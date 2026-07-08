@@ -36,6 +36,7 @@ export class Game {
     moves: 0,
     highestTile: 0,
     startedAt: Date.now(),
+    gameOver: false,
   };
 
   constructor(private radius: number) {
@@ -102,6 +103,10 @@ export class Game {
   }
 
   private move(direction: DIRECTION) {
+    if (this.stats.gameOver) {
+      return;
+    }
+
     this.stats.moves++;
 
     const lines = this.getLines(direction);
@@ -130,7 +135,33 @@ export class Game {
 
     if (moved) {
       this.addRandomTile();
+
+      if (!this.canMove()) {
+        this.stats.gameOver = true;
+      }
     }
+  }
+
+  private canMove(): boolean {
+    for (const tile of this.tiles.values()) {
+      // empty space exists
+      if (tile.value === 0) {
+        return true;
+      }
+
+      // check neighbours
+      for (const direction of Object.values(DIRECTION_VECTOR)) {
+        const neighbour = this.tiles.get(
+          this.key(tile.q + direction.q, tile.r + direction.r)
+        );
+
+        if (neighbour && neighbour.value === tile.value) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   private merge(tiles: Tile[]): Tile[] {

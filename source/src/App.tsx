@@ -126,6 +126,8 @@ export function Menu({ onStart }: { onStart: (size: number) => void }) {
 
           <p>Select field size</p>
 
+          <XpButton onClick={() => onStart(1)}>Very Small (7 tiles)</XpButton>
+
           <XpButton onClick={() => onStart(2)}>Small (19 tiles)</XpButton>
 
           <XpButton onClick={() => onStart(3)}>Medium (37 tiles)</XpButton>
