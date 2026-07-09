@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GameScreen } from "./components/GameScreen";
 
 export default function App() {
@@ -8,11 +8,31 @@ export default function App() {
     return <Menu onStart={(value) => setSize(value)} />;
   }
 
-  return <GameScreen size={size} />;
+  return <GameScreen size={size} onExit={() => setSize(null)} />;
 }
 
 export function Menu({ onStart }: { onStart: (size: number) => void }) {
   const [showError, setShowError] = useState(false);
+
+  const [codeLines, setCodeLines] = useState<string[]>([]);
+
+  useEffect(() => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789{}[]<>/\\=+-*_$#@";
+
+    const generateCode = () =>
+      Array.from(
+        { length: 100 },
+        () => chars[Math.floor(Math.random() * chars.length)]
+      ).join("");
+
+    setCodeLines(Array.from({ length: 25 }, generateCode));
+
+    const interval = setInterval(() => {
+      setCodeLines((prev) => [...prev.slice(1), generateCode()]);
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div
@@ -32,7 +52,47 @@ export function Menu({ onStart }: { onStart: (size: number) => void }) {
         background: "linear-gradient(#3a6ea5, #8cc63f)",
       }}
     >
+      {/* Animated code background */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+
+          overflow: "hidden",
+
+          fontFamily: "Consolas, monospace",
+
+          fontSize: 18,
+
+          color: "#00ff66",
+
+          opacity: 0.25,
+
+          pointerEvents: "none",
+
+          zIndex: 1,
+        }}
+      >
+        {codeLines.map((line, index) => (
+          <div
+            key={index}
+            style={{
+              whiteSpace: "nowrap",
+
+              marginTop: 8,
+
+              animation: `codeMove ${8 + (index % 5)}s linear infinite`,
+
+              transform: `translateX(${index % 2 === 0 ? "-200px" : "0px"})`,
+            }}
+          >
+            {line}
+          </div>
+        ))}
+      </div>
+
       {/* Main XP window */}
+
       <div
         style={{
           width: 420,
