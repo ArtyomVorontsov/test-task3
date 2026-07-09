@@ -96,8 +96,6 @@ export class Engine {
       });
 
       const topMaterial = new THREE.MeshPhysicalMaterial({
-        color: this.getTileColor(tile.value),
-
         transparent: true,
         opacity: 0.85,
 
@@ -146,12 +144,12 @@ export class Engine {
 
       const sideMaterial = materials[0];
       const topMaterial = materials[1];
+      const bottomMaterial = materials[2];
 
       // update color
       sideMaterial.color.set(this.getTileColor(tile.value));
-
-      topMaterial.map =
-        tile.value === 0 ? null : this.getTextTexture(tile.value);
+      topMaterial.map = this.getTextTexture(tile.value);
+      bottomMaterial.map = this.getTextTexture(tile.value);
 
       topMaterial.needsUpdate = true;
     });
@@ -247,17 +245,12 @@ export class Engine {
 
     // move origin to center
     ctx.translate(size / 2, size / 2);
-
-    // 🔁 rotate 45 degrees
     ctx.rotate(-(Math.PI / 3));
 
     // text
     ctx.fillStyle = value <= 4 ? "#000000" : "#ffffff";
-    // ctx.font = "bold 100px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    // ctx.fillStyle = "#000000";
-    // ctx.font = "bold 90px Tahoma, Arial";
     const fontSize = value >= 1000 ? 60 : value >= 100 ? 75 : 90;
     ctx.font = `bold ${fontSize}px Tahoma, Arial`;
 
@@ -269,16 +262,6 @@ export class Engine {
     gradient.addColorStop(0, "#ffffff");
     gradient.addColorStop(0.3, hex);
     gradient.addColorStop(1, "#7aa7d9");
-
-    // ctx.fillStyle = gradient;
-    // ctx.fillRect(0, 0, size, size);
-
-    // ctx.fillStyle = "rgba(255,255,255,0.4)";
-    // ctx.fillRect(0, 0, size, size * 0.3);
-
-    // ctx.strokeStyle = "#808080";
-    // ctx.lineWidth = 4;
-    // ctx.strokeRect(0, 0, size, size);
 
     if (value > 0) {
       ctx.fillText(value.toString(), 0, 0);
