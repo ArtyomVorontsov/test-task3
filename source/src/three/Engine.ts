@@ -72,7 +72,7 @@ export class Engine {
 
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-    this.scene.add(new THREE.AxesHelper(10));
+    // this.scene.add(new THREE.AxesHelper(10));
   }
 
   public getGame() {
