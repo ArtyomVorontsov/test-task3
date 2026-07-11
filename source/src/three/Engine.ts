@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { Game } from "./Game";
+import { Game, Tile } from "./Game";
 import backgroundImage from "../../assets/background-compressed.jpg";
 
 type HexMesh = {
@@ -37,7 +37,6 @@ export class Engine {
     this.camera.position.set(-2, 3, 3);
 
     this.camera.lookAt(0, 0, 0);
-    console.log(this.camera.rotation);
     this.camera.rotation.set(-0.829, -0.39, -0.393);
 
     this.renderer = new THREE.WebGLRenderer({
@@ -114,8 +113,6 @@ export class Engine {
 
       const mesh = new THREE.Mesh(geometry, materials);
 
-      // const mesh = new THREE.Mesh(geometry, material);
-
       const position = this.hexToWorld(tile.q, tile.r);
 
       mesh.position.set(position[1], position[2], position[0]);
@@ -131,7 +128,7 @@ export class Engine {
   }
 
   private updateBoard() {
-    const tiles = this.game.getMap();
+    const tiles = this.game.getCurrentFrame();
 
     tiles.forEach((tile) => {
       const hex = this.hexagons.find((h) => h.q === tile.q && h.r === tile.r);
@@ -148,8 +145,8 @@ export class Engine {
 
       // update color
       sideMaterial.color.set(this.getTileColor(tile.value));
-      topMaterial.map = this.getTextTexture(tile.value);
-      bottomMaterial.map = this.getTextTexture(tile.value);
+      topMaterial.map = this.getTextTexture(tile);
+      bottomMaterial.map = this.getTextTexture(tile);
 
       topMaterial.needsUpdate = true;
     });
@@ -228,7 +225,7 @@ export class Engine {
     this.renderer.setSize(width, height);
   };
 
-  private createTextTexture(value: number): THREE.CanvasTexture {
+  private createTextTexture(tile: Tile): THREE.CanvasTexture {
     const size = 256;
 
     const canvas = document.createElement("canvas");
@@ -238,7 +235,7 @@ export class Engine {
     const ctx = canvas.getContext("2d")!;
 
     // background
-    ctx.fillStyle = `#${this.getTileColor(value)
+    ctx.fillStyle = `#${this.getTileColor(tile.value)
       .toString(16)
       .padStart(6, "0")}`;
     ctx.fillRect(0, 0, size, size);
@@ -248,23 +245,23 @@ export class Engine {
     ctx.rotate(-(Math.PI / 3));
 
     // text
-    ctx.fillStyle = value <= 4 ? "#000000" : "#ffffff";
+    ctx.fillStyle = tile.value <= 4 ? "#000000" : "#ffffff";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const fontSize = value >= 1000 ? 60 : value >= 100 ? 75 : 90;
+    const fontSize = tile.value >= 1000 ? 60 : tile.value >= 100 ? 75 : 90;
     ctx.font = `bold ${fontSize}px Tahoma, Arial`;
 
     const gradient = ctx.createLinearGradient(0, 0, size, size);
 
-    const base = this.getTileColor(value);
+    const base = this.getTileColor(tile.value);
     const hex = `#${base.toString(16).padStart(6, "0")}`;
 
     gradient.addColorStop(0, "#ffffff");
     gradient.addColorStop(0.3, hex);
     gradient.addColorStop(1, "#7aa7d9");
 
-    if (value > 0) {
-      ctx.fillText(value.toString(), 0, 0);
+    if (tile.value > 0) {
+      ctx.fillText(tile.value.toString(), 0, 0);
     }
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -273,11 +270,11 @@ export class Engine {
     return texture;
   }
 
-  private getTextTexture(value: number) {
-    if (!this.textTextures.has(value)) {
-      this.textTextures.set(value, this.createTextTexture(value));
+  private getTextTexture(tile: Tile) {
+    if (!this.textTextures.has(tile.value)) {
+      this.textTextures.set(tile.value, this.createTextTexture(tile));
     }
-    return this.textTextures.get(value)!;
+    return this.textTextures.get(tile.value)!;
   }
 
   private addBackground() {
@@ -299,6 +296,8 @@ export class Engine {
   }
 
   public dispose() {
+    this.game.dispose();
+
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
     }

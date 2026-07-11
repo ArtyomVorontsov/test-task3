@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export enum DIRECTION {
   TL = "TL",
   TR = "TR",
@@ -7,7 +9,7 @@ export enum DIRECTION {
   BR = "BR",
 }
 
-type Tile = {
+export type Tile = {
   q: number;
   r: number;
   value: number;
@@ -39,13 +41,32 @@ export class Game {
     gameOver: false,
   };
 
+  private frames: Map<string, Tile>[] = [];
+
+  private handleKeyboardBound: (event: KeyboardEvent) => void;
+
   constructor(private radius: number) {
     this.createBoard();
 
-    window.addEventListener("keydown", this.handleKeyboard.bind(this));
+    this.addTile(1, 2);
+    this.pushFrame(this.tiles);
+    this.addTile(2, 2);
+    this.pushFrame(this.tiles);
 
-    this.addRandomTile();
-    this.addRandomTile();
+    this.handleKeyboardBound = this.handleKeyboard.bind(this);
+
+    window.addEventListener("keydown", this.handleKeyboardBound);
+  }
+
+  private pushFrame(frame: Map<string, Tile>) {
+    this.frames.push(
+      new Map(
+        Array.from(frame.entries()).map(([k, t]) => [
+          k,
+          { q: t.q, r: t.r, value: t.value },
+        ])
+      )
+    );
   }
 
   private key(q: number, r: number): string {
@@ -66,15 +87,27 @@ export class Game {
         });
       }
     }
+
+    this.pushFrame(this.tiles);
   }
 
   public getMap(): Tile[] {
     return Array.from(this.tiles.values());
   }
 
-  private handleKeyboard(event: KeyboardEvent) {
-    console.log(this.getMap());
+  public getCurrentFrame(): Tile[] {
+    if (this.frames.length) {
+      let f = this.frames.shift();
 
+      const frame = [...f!.values()];
+      f?.clear();
+      return frame;
+    }
+
+    return this.getMap();
+  }
+
+  private handleKeyboard(event: KeyboardEvent) {
     switch (event.code) {
       case "KeyQ":
         this.move(DIRECTION.BR);
@@ -85,11 +118,11 @@ export class Game {
         break;
 
       case "KeyW":
-        this.move(DIRECTION.T);
+        this.move(DIRECTION.B);
         break;
 
       case "KeyS":
-        this.move(DIRECTION.B);
+        this.move(DIRECTION.T);
         break;
 
       case "KeyA":
@@ -113,25 +146,39 @@ export class Game {
 
     let moved = false;
 
-    for (const line of lines) {
-      const tiles = line.map((pos) => this.tiles.get(this.key(pos.q, pos.r))!);
+    let mergeFinished: boolean[] = [];
 
-      const values = tiles.filter((tile) => tile.value > 0);
+    this.frames = [];
 
-      const merged = this.merge(values);
+    do {
+      mergeFinished = [];
 
-      for (let i = 0; i < line.length; i++) {
-        const tile = this.tiles.get(this.key(line[i].q, line[i].r))!;
+      this.pushFrame(this.tiles);
 
-        const value = merged[i]?.value ?? 0;
+      for (const line of lines) {
+        const tiles = line.map(
+          (pos) => this.tiles.get(this.key(pos.q, pos.r))!
+        );
 
-        if (tile.value !== value) {
-          moved = true;
+        const values = tiles;
+
+        let step = this.mergeStep(values, direction);
+
+        mergeFinished.push(step.mergeFinished);
+
+        for (let i = 0; i < line.length; i++) {
+          const tile = this.tiles.get(this.key(line[i].q, line[i].r))!;
+
+          const value = step.tiles[i]?.value ?? 0;
+
+          if (tile.value !== value) {
+            moved = true;
+          }
+
+          tile.value = value;
         }
-
-        tile.value = value;
       }
-    }
+    } while (mergeFinished.filter((a) => a === false).length !== 0);
 
     if (moved) {
       this.addRandomTile();
@@ -164,33 +211,106 @@ export class Game {
     return false;
   }
 
-  private merge(tiles: Tile[]): Tile[] {
-    const result: Tile[] = [];
+  private moveTilesIntoEmptySpaces(ordered: Tile[], result: Tile[]) {
+    for (let i = 0; i < ordered.length; i++) {
+      const current = ordered[i];
 
-    for (let i = 0; i < tiles.length; i++) {
-      const current = tiles[i];
+      if (current.value === 0) {
+        continue;
+      }
 
-      if (i + 1 < tiles.length && current.value === tiles[i + 1].value) {
-        const newValue = current.value * 2;
+      for (let j = i + 1; j < ordered.length; j++) {
+        const next = ordered[j];
 
-        this.stats.score += newValue;
+        if (next.value === 0) {
+          next.value = current.value;
+          current.value = 0;
 
-        this.stats.highestTile = Math.max(this.stats.highestTile, newValue);
+          return {
+            mergeFinished: false,
+            tiles: result,
+          };
+        }
 
-        result.push({
-          ...current,
-          value: newValue,
-        });
+        // another tile blocks movement
+        break;
+      }
+    }
+  }
 
-        i++;
-      } else {
-        result.push(current);
+  private mergeStep(
+    tiles: Tile[],
+    direction: DIRECTION
+  ): {
+    mergeFinished: boolean;
+    tiles: Tile[];
+  } {
+    const result = tiles.map((tile) => ({ ...tile }));
+
+    const ordered = [...result].sort((a, b) => {
+      switch (direction) {
+        case DIRECTION.BR:
+          return b.q - a.q;
+
+        case DIRECTION.BL:
+          return b.r - a.r;
+
+        case DIRECTION.T:
+          return b.q + b.r - (a.q + a.r);
+
+        case DIRECTION.B:
+          return a.q + a.r - (b.q + b.r);
+
+        case DIRECTION.TL:
+          return a.q - b.q;
+
+        case DIRECTION.TR:
+          return a.r - b.r;
+
+        default:
+          return 0;
+      }
+    });
+
+    // 1. Move tiles into empty spaces
+    let movedTiles = this.moveTilesIntoEmptySpaces(ordered, result);
+    if (movedTiles) {
+      return movedTiles;
+    }
+
+    // 2. Merge tiles after movement is complete
+    for (let i = 0; i < ordered.length - 1; i++) {
+      const current = ordered[i];
+      const next = ordered[i + 1];
+      const nextNext = ordered[i + 2];
+
+      if (
+        current.value &&
+        next.value &&
+        nextNext &&
+        nextNext.value &&
+        next.value == nextNext.value
+      ) {
+        continue;
+      }
+
+      if (current.value !== 0 && current.value === next.value) {
+        next.value *= 2;
+        current.value = 0;
       }
     }
 
-    return result;
-  }
+    movedTiles = this.moveTilesIntoEmptySpaces(ordered, result);
 
+    if (movedTiles) {
+      return movedTiles;
+    }
+
+    return {
+      mergeFinished: true,
+      tiles: result,
+    };
+  }
   private addRandomTile() {
     const emptyTiles = Array.from(this.tiles.values()).filter(
       (tile) => tile.value === 0
@@ -203,6 +323,20 @@ export class Game {
     const tile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
 
     tile.value = Math.random() < 0.9 ? 2 : 4;
+  }
+
+  private addTile(tileId: number, tileValue: number) {
+    const emptyTiles = Array.from(this.tiles.values()).filter(
+      (tile) => tile.value === 0
+    );
+
+    if (emptyTiles.length === 0) {
+      return;
+    }
+
+    const tile = emptyTiles[tileId];
+
+    tile.value = tileValue;
   }
 
   private getLines(direction: DIRECTION): Position[][] {
@@ -241,6 +375,10 @@ export class Game {
     }
 
     return lines;
+  }
+
+  public dispose() {
+    window.removeEventListener("keydown", this.handleKeyboardBound);
   }
 
   public getStats() {

@@ -3,6 +3,7 @@ import ThreeCanvas from "./ThreeCanvas";
 import { GameStats } from "./Statistics";
 import { GameOver } from "./GameOver";
 import { Game } from "../three/Game";
+import Keyboard from "./Keyboard";
 
 export function GameScreen({
   size,
@@ -36,6 +37,7 @@ export function GameScreen({
       }}
     >
       <ThreeCanvas key={restartKey} radius={size} onGameReady={setGame} />
+      <Keyboard />
 
       <GameStats game={game} />
 
