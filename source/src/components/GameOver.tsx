@@ -1,5 +1,5 @@
 import { Game } from "../three/Game";
-import dogGif from "./assets/dog.gif";
+import dogGif from "../../assets/dog.gif";
 
 export function GameOver({
   game,
