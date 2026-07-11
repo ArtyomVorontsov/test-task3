@@ -1,4 +1,5 @@
 import { Game } from "../three/Game";
+import dogGif from "./assets/dog.gif";
 
 export function GameOver({
   game,
@@ -85,7 +86,7 @@ export function GameOver({
         >
           {/* GIF */}
           <img
-            src="/dog.gif"
+            src={dogGif}
             style={{
               width: 120,
               height: 120,
