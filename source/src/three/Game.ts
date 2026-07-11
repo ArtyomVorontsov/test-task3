@@ -180,6 +180,13 @@ export class Game {
       }
     } while (mergeFinished.filter((a) => a === false).length !== 0);
 
+    this.stats.score = 0;
+    this.tiles.forEach((t) => {
+      this.stats.score += t.value;
+      this.stats.highestTile =
+        this.stats.highestTile < t.value ? t.value : this.stats.highestTile;
+    });
+
     if (moved) {
       this.addRandomTile();
 
