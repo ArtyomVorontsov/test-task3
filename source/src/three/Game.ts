@@ -13,6 +13,7 @@ export type Tile = {
   q: number;
   r: number;
   value: number;
+  merged: boolean;
 };
 
 type Position = {
@@ -52,6 +53,8 @@ export class Game {
     this.pushFrame(this.tiles);
     this.addTile(2, 2);
     this.pushFrame(this.tiles);
+    this.addTile(3, 4);
+    this.pushFrame(this.tiles);
 
     this.handleKeyboardBound = this.handleKeyboard.bind(this);
 
@@ -63,7 +66,7 @@ export class Game {
       new Map(
         Array.from(frame.entries()).map(([k, t]) => [
           k,
-          { q: t.q, r: t.r, value: t.value },
+          { q: t.q, r: t.r, value: t.value, merged: t.merged },
         ])
       )
     );
@@ -84,6 +87,7 @@ export class Game {
           q,
           r,
           value: 0,
+          merged: false,
         });
       }
     }
@@ -150,6 +154,10 @@ export class Game {
 
     this.frames = [];
 
+    this.tiles.forEach((t) => {
+      t.merged = false;
+    });
+
     do {
       mergeFinished = [];
 
@@ -163,12 +171,13 @@ export class Game {
         const values = tiles;
 
         let step = this.mergeStep(values, direction);
+        console.log(step);
 
         mergeFinished.push(step.mergeFinished);
 
         for (let i = 0; i < line.length; i++) {
           const tile = this.tiles.get(this.key(line[i].q, line[i].r))!;
-
+          tile.merged = step.tiles[i].merged;
           const value = step.tiles[i]?.value ?? 0;
 
           if (tile.value !== value) {
@@ -303,7 +312,9 @@ export class Game {
 
       if (current.value !== 0 && current.value === next.value) {
         next.value *= 2;
+        next.merged = true;
         current.value = 0;
+        break;
       }
     }
 

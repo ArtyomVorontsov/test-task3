@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Game, Tile } from "./Game";
 import backgroundImage from "../../assets/background-compressed.jpg";
+import { ParticleExplosion } from "./ParticleExplosion";
 
 type HexMesh = {
   q: number;
@@ -20,6 +21,9 @@ export class Engine {
 
   private game: Game;
   private hexagons: HexMesh[] = [];
+
+  private explosions: ParticleExplosion[] = [];
+  private clock = new THREE.Clock();
 
   private readonly hexSize = 1;
 
@@ -57,6 +61,13 @@ export class Engine {
     this.init();
 
     this.animate();
+  }
+
+  private spawnExplosion(position: THREE.Vector3, color: number) {
+    const explosion = new ParticleExplosion(position, color);
+
+    this.scene.add(explosion.points);
+    this.explosions.push(explosion);
   }
 
   private init() {
@@ -137,6 +148,11 @@ export class Engine {
         return;
       }
 
+      if (tile.merged) {
+        this.spawnExplosion(hex.mesh.position.clone(), 0xffcc33);
+        tile.merged = false;
+      }
+
       const materials = hex.mesh.material as THREE.MeshStandardMaterial[];
 
       const sideMaterial = materials[0];
@@ -209,6 +225,16 @@ export class Engine {
     this.controls.update();
 
     this.updateBoard();
+
+    const dt = this.clock.getDelta();
+
+    for (let i = this.explosions.length - 1; i >= 0; i--) {
+      if (this.explosions[i].update(dt)) {
+        this.scene.remove(this.explosions[i].points);
+        this.explosions[i].dispose();
+        this.explosions.splice(i, 1);
+      }
+    }
 
     this.renderer.render(this.scene, this.camera);
   };
