@@ -171,7 +171,6 @@ export class Game {
         const values = tiles;
 
         let step = this.mergeStep(values, direction);
-        console.log(step);
 
         mergeFinished.push(step.mergeFinished);
 
@@ -227,7 +226,11 @@ export class Game {
     return false;
   }
 
-  private moveTilesIntoEmptySpaces(ordered: Tile[], result: Tile[], mergeFinished: boolean) {
+  private moveTilesIntoEmptySpaces(
+    ordered: Tile[],
+    result: Tile[],
+    mergeFinished: boolean
+  ) {
     for (let i = 0; i < ordered.length; i++) {
       const current = ordered[i];
 
@@ -261,7 +264,6 @@ export class Game {
     mergeFinished: boolean;
     tiles: Tile[];
   } {
-    console.log("merge step")
     const result = tiles.map((tile) => ({ ...tile }));
 
     const ordered = [...result].sort((a, b) => {
