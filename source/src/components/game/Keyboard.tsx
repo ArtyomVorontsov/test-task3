@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Keyboard.css";
+import XpButton from "../common/xpButton";
 
 function pressKey(code: string) {
   window.dispatchEvent(
@@ -53,9 +54,19 @@ export default function Keyboard() {
   return (
     <>
       {!isMobile && !visible && (
-        <button className="xp-show-keyboard" onClick={() => setVisible(true)}>
+        <XpButton
+          onClick={() => setVisible(true)}
+          width={150}
+          height={40}
+          style={{
+            position: "fixed",
+            right: 20,
+            bottom: 20,
+            zIndex: 99999,
+          }}
+        >
           Show Keyboard
-        </button>
+        </XpButton>
       )}
 
       {visible && (
@@ -64,9 +75,28 @@ export default function Keyboard() {
             <div className="xp-titlebar">
               <span className="xp-title">Keyboard</span>
 
-              <button className="xp-close" onClick={() => setVisible(false)}>
+              <XpButton
+                onClick={() => setVisible(false)}
+                width={24}
+                height={24}
+                style={{
+                  padding: 0,
+
+                  color: "white",
+
+                  fontSize: 16,
+
+                  borderRadius: 4,
+
+                  border: "1px solid white",
+
+                  background: "linear-gradient(#ff8080,#c00000)",
+
+                  boxShadow: "none",
+                }}
+              >
                 ×
-              </button>
+              </XpButton>
             </div>
           )}
 

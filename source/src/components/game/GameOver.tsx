@@ -1,5 +1,6 @@
-import { Game } from "../three/Game";
-import dogGif from "../../assets/dog.gif";
+import { Game } from "../../three/Game";
+import dogGif from "../../../assets/dog.gif";
+import XpButton from "../common/xpButton";
 
 export function GameOver({
   game,
@@ -138,38 +139,9 @@ export function GameOver({
         </div>
 
         {/* Buttons */}
-        <div
-          style={{
-            display: "flex",
-
-            justifyContent: "center",
-
-            paddingBottom: 20,
-          }}
-        >
-          <button
-            onClick={onRestart}
-            style={{
-              width: 100,
-
-              height: 35,
-
-              fontFamily: "Tahoma",
-
-              fontWeight: "bold",
-
-              cursor: "pointer",
-
-              borderRadius: 5,
-
-              border: "2px solid #316ac5",
-
-              background: "linear-gradient(#fff,#9bbcf5)",
-            }}
-          >
-            OK
-          </button>
-        </div>
+        <XpButton width={100} onClick={onRestart}>
+          OK
+        </XpButton>
 
         {/* XP status bar */}
         <div

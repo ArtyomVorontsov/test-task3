@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Game } from "../three/Game";
+import { Game } from "../../three/Game";
+import XpButton from "../common/xpButton";
 
 export function GameStats({ game }: { game: Game | null }) {
   const [visible, setVisible] = useState(true);
@@ -16,33 +17,18 @@ export function GameStats({ game }: { game: Game | null }) {
 
   if (!game || !visible) {
     return (
-      <button
+      <XpButton
         onClick={() => setVisible(true)}
+        width={120}
+        height={40}
         style={{
           position: "absolute",
-
           top: 20,
           left: 20,
-
-          fontFamily: "Tahoma",
-
-          cursor: "pointer",
-
-          background: "linear-gradient(#4ca2ff,#0054e3)",
-
-          color: "white",
-
-          border: "2px solid white",
-
-          borderRadius: 5,
-
-          padding: "8px 15px",
-
-          fontWeight: "bold",
         }}
       >
         Show Stats
-      </button>
+      </XpButton>
     );
   }
 
@@ -98,15 +84,14 @@ export function GameStats({ game }: { game: Game | null }) {
         <span>Game Statistics</span>
 
         {/* Close button */}
-        <button
+        <XpButton
           onClick={() => setVisible(false)}
+          width={22}
+          height={22}
           style={{
-            width: 22,
-            height: 22,
-
             padding: 0,
 
-            cursor: "pointer",
+            minWidth: 22,
 
             color: "white",
 
@@ -121,10 +106,12 @@ export function GameStats({ game }: { game: Game | null }) {
             border: "1px solid white",
 
             background: "linear-gradient(#ff8080,#c00000)",
+
+            boxShadow: "none",
           }}
         >
           ×
-        </button>
+        </XpButton>
       </div>
 
       {/* Stats content */}

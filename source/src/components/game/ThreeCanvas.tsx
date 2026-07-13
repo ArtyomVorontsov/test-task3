@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Engine } from "../three/Engine";
-import { Game } from "../three/Game";
+import { Engine } from "../../three/Engine";
+import { Game } from "../../three/Game";
 
 export default function ThreeCanvas({
   radius,

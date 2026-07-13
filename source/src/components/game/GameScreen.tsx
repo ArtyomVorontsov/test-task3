@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import ThreeCanvas from "./ThreeCanvas";
 import { GameStats } from "./Statistics";
 import { GameOver } from "./GameOver";
-import { Game } from "../three/Game";
+import { Game } from "../../three/Game";
 import Keyboard from "./Keyboard";
 import Hint from "./Hint";
+import XpButton from "../common/xpButton";
 
 export function GameScreen({
   size,
@@ -52,31 +53,18 @@ export function GameScreen({
         }}
       />
 
-      <button
+      <XpButton
         onClick={onExit}
+        width={140}
+        height={42}
         style={{
           position: "absolute",
-
           top: 20,
           right: 20,
-
-          fontFamily: "Tahoma",
-
-          fontWeight: "bold",
-
-          cursor: "pointer",
-
-          padding: "10px 20px",
-
-          borderRadius: 5,
-
-          border: "2px solid #316ac5",
-
-          background: "linear-gradient(#fff,#9bbcf5)",
         }}
       >
         Go to Menu
-      </button>
+      </XpButton>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { GameScreen } from "./components/GameScreen";
-import { Menu } from "./components/Menu";
+import { GameScreen } from "./components/game/GameScreen";
+import { Menu } from "./components/menu/Menu";
 
 export default function App() {
   const [size, setSize] = useState<number | null>(null);

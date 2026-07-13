@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import clipGif from "../../assets/clip.gif";
+import clipGif from "../../../assets/clip.gif";
+import XpButton from "../common/xpButton";
 
 export function Menu({ onStart }: { onStart: (size: number) => void }) {
   const [showError, setShowError] = useState(false);
@@ -127,22 +128,17 @@ export function Menu({ onStart }: { onStart: (size: number) => void }) {
           <span>Hex 2048.exe</span>
 
           {/* Fake close button */}
-          <button
+          <XpButton
+            width={24}
+            height={24}
             onClick={() => setShowError(true)}
             style={{
-              width: 24,
-              height: 24,
-
               padding: 0,
-
-              cursor: "pointer",
 
               color: "white",
 
-              fontWeight: "bold",
-
               fontSize: 16,
-
+              fontWeight: "bold",
               lineHeight: "20px",
 
               borderRadius: 4,
@@ -150,10 +146,14 @@ export function Menu({ onStart }: { onStart: (size: number) => void }) {
               border: "1px solid white",
 
               background: "linear-gradient(#ff8080,#c00000)",
+
+              boxShadow: "none",
+
+              minWidth: 24,
             }}
           >
             ×
-          </button>
+          </XpButton>
         </div>
 
         {/* Content */}
@@ -186,9 +186,6 @@ export function Menu({ onStart }: { onStart: (size: number) => void }) {
 
               marginBottom: 20,
 
-             
-
-
               padding: 4,
             }}
           />
@@ -204,13 +201,49 @@ export function Menu({ onStart }: { onStart: (size: number) => void }) {
             Select field size
           </p>
 
-          <XpButton onClick={() => onStart(1)}>Very Small (7 tiles)</XpButton>
+          <XpButton
+            width="100%"
+            height={42}
+            style={{
+              margin: "5px 0px",
+            }}
+            onClick={() => onStart(1)}
+          >
+            Very Small (7 tiles)
+          </XpButton>
 
-          <XpButton onClick={() => onStart(2)}>Small (19 tiles)</XpButton>
+          <XpButton
+            width="100%"
+            height={42}
+            style={{
+              margin: "5px 0px",
+            }}
+            onClick={() => onStart(2)}
+          >
+            Small (19 tiles)
+          </XpButton>
 
-          <XpButton onClick={() => onStart(3)}>Medium (37 tiles)</XpButton>
+          <XpButton
+            width="100%"
+            height={42}
+            style={{
+              margin: "5px 0px",
+            }}
+            onClick={() => onStart(3)}
+          >
+            Medium (37 tiles)
+          </XpButton>
 
-          <XpButton onClick={() => onStart(4)}>Large (61 tiles)</XpButton>
+          <XpButton
+            width="100%"
+            height={42}
+            style={{
+              padding: "0 20px",
+            }}
+            onClick={() => onStart(4)}
+          >
+            Large (61 tiles)
+          </XpButton>
         </div>
 
         {/* Status bar */}
@@ -327,44 +360,5 @@ export function Menu({ onStart }: { onStart: (size: number) => void }) {
         </div>
       )}
     </div>
-  );
-}
-
-function XpButton({
-  children,
-  onClick,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        width: "100%",
-
-        height: 42,
-
-        marginBottom: 12,
-
-        cursor: "pointer",
-
-        fontFamily: "Tahoma, Arial",
-
-        fontSize: 15,
-
-        fontWeight: "bold",
-
-        borderRadius: 5,
-
-        border: "2px solid #316ac5",
-
-        background: "linear-gradient(#ffffff,#dbe9ff,#9bbcf5)",
-
-        boxShadow: "inset 0 1px white, 0 2px 4px #777",
-      }}
-    >
-      {children}
-    </button>
   );
 }
