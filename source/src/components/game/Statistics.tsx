@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Game } from "../../three/Game";
+import { Game } from "../../logic/Game";
 import XpButton from "../common/XpButton";
 import XpWindow from "../common/XpWindow";
 

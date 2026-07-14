@@ -1,4 +1,4 @@
-import { Game } from "../../three/Game";
+import { Game } from "../../logic/Game";
 import dogGif from "../../../assets/dog.gif";
 
 import XpButton from "../common/XpButton";

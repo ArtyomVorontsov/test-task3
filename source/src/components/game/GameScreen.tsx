@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ThreeCanvas from "./ThreeCanvas";
 import { GameStats } from "./Statistics";
 import { GameOver } from "./GameOver";
-import { Game } from "../../three/Game";
+import { Game } from "../../logic/Game";
 import Keyboard from "./Keyboard";
 import Hint from "./Hint";
 import XpButton from "../common/XpButton";

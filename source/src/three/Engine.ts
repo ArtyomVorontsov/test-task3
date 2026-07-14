@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { Game, Tile } from "./Game";
+import { Game, Tile } from "../logic/Game";
 import backgroundImage from "../../assets/background-compressed.jpg";
 import { ParticleExplosion } from "./ParticleExplosion";
 
