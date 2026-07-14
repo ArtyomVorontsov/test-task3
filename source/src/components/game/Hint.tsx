@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import XpWindow from "../common/XpWindow";
 
 export default function Hint() {
   const [visible, setVisible] = useState(true);
 
-  const isMobile =
-    "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -22,49 +22,19 @@ export default function Hint() {
     <div
       style={{
         position: "fixed",
+
         top: 20,
         left: "50%",
+
         transform: "translateX(-50%)",
-
-        width: 420,
-        maxWidth: "calc(100vw - 32px)",
-
-        background: "#ece9d8",
-
-        border: "2px solid #245edb",
-
-        boxShadow: "4px 4px 12px rgba(0,0,0,.35)",
-
-        fontFamily: "Tahoma, Arial, sans-serif",
 
         zIndex: 999999,
       }}
     >
-      {/* XP Title Bar */}
-      <div
-        style={{
-          height: 30,
-
-          display: "flex",
-          alignItems: "center",
-
-          paddingLeft: 10,
-
-          color: "white",
-
-          fontWeight: "bold",
-
-          background: "linear-gradient(#4ca2ff,#0054e3)",
-
-          textShadow: "1px 1px #003399",
-        }}
-      >
-        💡 Controls
-      </div>
-
-      {/* Content */}
-      <div
-        style={{
+      <XpWindow
+        title="💡 Controls"
+        width={420}
+        contentStyle={{
           padding: 16,
 
           lineHeight: 1.6,
@@ -73,6 +43,7 @@ export default function Hint() {
 
           fontSize: 14,
         }}
+        onClose={() => setVisible(false)}
       >
         {isMobile ? (
           <>
@@ -91,7 +62,7 @@ export default function Hint() {
             <div>⌨️ Move tiles with Q W E A S D.</div>
           </>
         )}
-      </div>
+      </XpWindow>
     </div>
   );
 }

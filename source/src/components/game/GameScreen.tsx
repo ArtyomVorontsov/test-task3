@@ -5,7 +5,7 @@ import { GameOver } from "./GameOver";
 import { Game } from "../../three/Game";
 import Keyboard from "./Keyboard";
 import Hint from "./Hint";
-import XpButton from "../common/xpButton";
+import XpButton from "../common/XpButton";
 
 export function GameScreen({
   size,

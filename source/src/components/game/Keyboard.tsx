@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./Keyboard.css";
-import XpButton from "../common/xpButton";
+
+import XpButton from "../common/XpButton";
+import XpWindow from "../common/XpWindow";
 
 function pressKey(code: string) {
   window.dispatchEvent(
@@ -39,6 +41,7 @@ export default function Keyboard() {
 
     const update = () => {
       setIsMobile(media.matches);
+
       if (media.matches) {
         setVisible(true);
       }
@@ -50,6 +53,22 @@ export default function Keyboard() {
 
     return () => media.removeEventListener("change", update);
   }, []);
+
+  const keyboard = (
+    <div className="xp-body">
+      <div className="xp-row">
+        <Key label="Q" code="KeyQ" />
+        <Key label="W" code="KeyW" />
+        <Key label="E" code="KeyE" />
+      </div>
+
+      <div className="xp-row">
+        <Key label="A" code="KeyA" />
+        <Key label="S" code="KeyS" />
+        <Key label="D" code="KeyD" />
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -69,52 +88,30 @@ export default function Keyboard() {
         </XpButton>
       )}
 
-      {visible && (
-        <div className="xp-keyboard">
-          {!isMobile && (
-            <div className="xp-titlebar">
-              <span className="xp-title">Keyboard</span>
-
-              <XpButton
-                onClick={() => setVisible(false)}
-                width={24}
-                height={24}
-                style={{
-                  padding: 0,
-
-                  color: "white",
-
-                  fontSize: 16,
-
-                  borderRadius: 4,
-
-                  border: "1px solid white",
-
-                  background: "linear-gradient(#ff8080,#c00000)",
-
-                  boxShadow: "none",
-                }}
-              >
-                ×
-              </XpButton>
-            </div>
-          )}
-
-          <div className="xp-body">
-            <div className="xp-row">
-              <Key label="Q" code="KeyQ" />
-              <Key label="W" code="KeyW" />
-              <Key label="E" code="KeyE" />
-            </div>
-
-            <div className="xp-row">
-              <Key label="A" code="KeyA" />
-              <Key label="S" code="KeyS" />
-              <Key label="D" code="KeyD" />
-            </div>
+      {visible &&
+        (isMobile ? (
+          <div className="xp-keyboard">{keyboard}</div>
+        ) : (
+          <div
+            style={{
+              position: "fixed",
+              right: 20,
+              bottom: 20,
+              zIndex: 99999,
+            }}
+          >
+            <XpWindow
+              title="Keyboard"
+              width={260}
+              onClose={() => setVisible(false)}
+              contentStyle={{
+                padding: 12,
+              }}
+            >
+              {keyboard}
+            </XpWindow>
           </div>
-        </div>
-      )}
+        ))}
     </>
   );
 }

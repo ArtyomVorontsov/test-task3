@@ -1,6 +1,8 @@
 import { Game } from "../../three/Game";
 import dogGif from "../../../assets/dog.gif";
-import XpButton from "../common/xpButton";
+
+import XpButton from "../common/XpButton";
+import XpWindow from "../common/XpWindow";
 
 export function GameOver({
   game,
@@ -36,124 +38,94 @@ export function GameOver({
         fontFamily: "Tahoma, Arial, sans-serif",
       }}
     >
-      <div
-        style={{
-          width: 450,
-
-          background: "#ece9d8",
-
-          border: "3px solid #245edb",
-
-          borderRadius: 10,
-
-          boxShadow: "0 15px 50px rgba(0,0,0,0.8)",
-
-          overflow: "hidden",
+      <XpWindow
+        title="Hex 2048.exe - Fatal Error"
+        width={450}
+        contentStyle={{
+          padding: 25,
         }}
       >
-        {/* XP title */}
-        <div
-          style={{
-            height: 40,
-
-            display: "flex",
-
-            alignItems: "center",
-
-            paddingLeft: 15,
-
-            color: "white",
-
-            fontWeight: "bold",
-
-            background: "linear-gradient(#4ca2ff,#0054e3)",
-
-            textShadow: "1px 1px #003399",
-          }}
-        >
-          Hex 2048.exe - Fatal Error
-        </div>
-
-        <div
-          style={{
-            padding: 25,
-
-            display: "flex",
-
-            gap: 20,
-
-            alignItems: "center",
-          }}
-        >
-          {/* GIF */}
-          <img
-            src={dogGif}
+        <>
+          {/* Main content */}
+          <div
             style={{
-              width: 120,
-              height: 120,
-              objectFit: "cover",
+              display: "flex",
+
+              gap: 20,
+
+              alignItems: "center",
+
+              marginBottom: 20,
             }}
-          />
-
-          <div>
-            <div
+          >
+            <img
+              src={dogGif}
+              alt="Game Over"
               style={{
-                fontSize: 18,
+                width: 120,
+                height: 120,
 
-                fontWeight: "bold",
-
-                marginBottom: 10,
+                objectFit: "cover",
               }}
-            >
-              No more legal moves!
-            </div>
-
-            <div>The hexagons have formed an unstoppable union.</div>
-
-            <br />
+            />
 
             <div>
-              Windows suggests:
+              <div
+                style={{
+                  fontSize: 18,
+
+                  fontWeight: "bold",
+
+                  marginBottom: 10,
+                }}
+              >
+                No more legal moves!
+              </div>
+
+              <div>The hexagons have formed an unstoppable union.</div>
+
               <br />
-              "Have you tried turning the board off and on again?"
+
+              <div>
+                Windows suggests:
+                <br />
+                "Have you tried turning the board off and on again?"
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Statistics */}
-        <div
-          style={{
-            padding: "0 25px 20px",
+          {/* Statistics */}
+          <div
+            style={{
+              color: "#333",
 
-            color: "#333",
-          }}
-        >
-          Final score:
-          <b> {stats.score}</b>
-          <br />
-          Best tile:
-          <b> {stats.highestTile}</b>
-          <br />
-          Moves survived:
-          <b> {stats.moves}</b>
-        </div>
+              marginBottom: 24,
+            }}
+          >
+            Final score:
+            <b> {stats.score}</b>
+            <br />
+            Best tile:
+            <b> {stats.highestTile}</b>
+            <br />
+            Moves survived:
+            <b> {stats.moves}</b>
+          </div>
 
-        {/* Buttons */}
-        <XpButton width={100} onClick={onRestart}>
-          OK
-        </XpButton>
+          {/* Button */}
+          <div
+            style={{
+              display: "flex",
 
-        {/* XP status bar */}
-        <div
-          style={{
-            height: 25,
-
-            background: "#d6d3ce",
-
-            borderTop: "1px solid #aaa",
-          }}
-        />
-      </div>
+              justifyContent: "center",
+            }}
+          >
+            <XpButton width={90} onClick={onRestart}>
+              OK
+            </XpButton>
+          </div>
+        </>
+      </XpWindow>
     </div>
   );
 }
